@@ -96,22 +96,19 @@ BoxLayout:
                     on_press: app.create_show_equipment_buttons()
                     font_size: 30
                 BoxLayout:
-                    orientation: "vertical"
-                    BoxLayout:
-                        Button:
-                            text: "Steal"
-                            on_press: app.activate_steal()
-                            font_size: 30
-                        Button:
-                            text: "Reset Energy"
-                            on_press: app.modify_statistic(self)
-                            font_size: 30
-                    BoxLayout:
-                        size_hint_y: 0.4
-                        Button:
-                            text: "Check Card"
-                            on_press: app.activate_check_card()
-                            font_size: 30
+                    Button:
+                        text: "Steal"
+                        on_press: app.activate_steal()
+                        font_size: 30
+                    Button:
+                        text: "Reset Energy"
+                        on_press: app.modify_statistic(self)
+                        font_size: 30
+                BoxLayout:
+                    Button:
+                        text: "Check Card"
+                        on_press: app.activate_check_card()
+                        font_size: 30
 
         BoxLayout:
             orientation: "vertical"
@@ -141,5 +138,6 @@ BoxLayout:
     Label:
         size_hint_y: 0.3
         id: output_prompt
+        font_size: 20
         font_name: "fonts/msyh.ttc"
         text: ""

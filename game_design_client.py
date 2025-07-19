@@ -204,7 +204,7 @@ class GameDesignClient(App):
             self.root.ids.cards.clear_widgets()
             for player in self.players:
                 if player.name != selected_player.name:
-                    temp_button_hand = Button(font_name="fonts/msyh.ttc",text=f"{player.name}\n(hand)", font_size=30, color=tuple(self.root.ids[player.name+"_button"].color))
+                    temp_button_hand = Button(font_name="fonts/msyh.ttc",text=f"{player.name}\n(hand){len(player.cards)}", font_size=30, color=tuple(self.root.ids[player.name+"_button"].color))
                     temp_button_hand.bind(on_press=self.steal_a_card)
                     self.root.ids.cards.add_widget(temp_button_hand)
                     self.root.ids[player.name].clear_widgets()
@@ -226,7 +226,7 @@ class GameDesignClient(App):
 
     def steal_a_card(self, instance):
         selected_player = [player for player in self.players if player.selected][0]
-        victim_player = [player for player in self.players if player.name == instance.text[:-7]][0]
+        victim_player = [player for player in self.players if player.name == instance.text[:instance.text.find("\n")]][0]
         if victim_player.cards == []:
             self.change_prompt("There's no card to steal!")
         else:
