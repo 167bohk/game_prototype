@@ -154,12 +154,14 @@ class GameDesignClient(App):
                 temp_button = Button(font_name="fonts/msyh.ttc",text=f"{card.name}", font_size=30, color=color)
                 temp_button.card = card
                 temp_button.bind(on_press=self.discard_a_card)
+                temp_button.player = selected_player
                 self.root.ids.cards.add_widget(temp_button)
 
             for equipment in selected_player.equipments:
                 temp_button = Button(font_name="fonts/msyh.ttc",text=equipment.name, color=(0.5, 1, 0, 1),font_size=30)
                 temp_button.card = equipment
                 temp_button.bind(on_press=self.discard_an_equipment)
+                temp_button.player = selected_player
                 self.root.ids.equipments.add_widget(temp_button)
 
             temp_up_button = Button(font_name="fonts/msyh.ttc",text="up", font_size=30)
@@ -172,35 +174,33 @@ class GameDesignClient(App):
         self.root.ids.output_prompt.text = prompt
 
     def discard_a_card(self, instance):
-        try:
-            selected_player = [player for player in self.players if player.selected][0]
-            player_name = selected_player.name
-            card_to_discard = instance.card
-            card_to_discard.number = 1
-            selected_player.cards.remove(card_to_discard)
-
-            if card_to_discard.is_premium:
-                self.premium_discard_pile.append(card_to_discard)
-            else:
-                self.normal_discard_pile.append(card_to_discard)
-            self.switch_player(player_name)
-
-        except IndexError:
-            self.change_prompt("You haven't select a player yet!")
-        except UnboundLocalError:
-            self.change_prompt("You haven't select a player yet!")
+        selected_player = instance.player
+        player_name = selected_player.name
+        card_to_discard = instance.card
+        card_to_discard.number = 1
+        selected_player.cards.remove(card_to_discard)
+        if card_to_discard.is_premium:
+            self.premium_discard_pile.append(card_to_discard)
+        else:
+            self.normal_discard_pile.append(card_to_discard)
+        self.switch_player(player_name)
 
     def activate_modify_model(self, name):
         try:
+            selected_player = [player for player in self.players if player.selected][0]
             self.root.ids.up_down.clear_widgets()
             temp_up_button = Button(font_name="fonts/msyh.ttc",text=name, color=(0.5, 1, 0, 1), font_size=30)
             temp_up_button.bind(on_press=self.modify_statistic)
+
             temp_down_button = Button(font_name="fonts/msyh.ttc",text=name, color=(1, 0, 0, 1), font_size=30)
             temp_down_button.bind(on_press=self.modify_statistic)
+
             self.root.ids.up_down.add_widget(temp_up_button)
             self.root.ids.up_down.add_widget(temp_down_button)
             self.change_prompt(f"Modifying {name}, press green button to +1, press red button to -1.")
-        except TypeError:
+        except IndexError:
+            self.change_prompt("You haven't select a player yet!")
+        except UnboundLocalError:
             self.change_prompt("You haven't select a player yet!")
 
     def activate_steal(self):
@@ -211,6 +211,8 @@ class GameDesignClient(App):
                 if player.name != selected_player.name:
                     temp_button_hand = Button(font_name="fonts/msyh.ttc",text=f"{player.name}\n(hand){len(player.cards)}", font_size=30, color=tuple(self.root.ids[player.name+"_button"].color))
                     temp_button_hand.bind(on_press=self.steal_a_card)
+                    temp_button_hand.selected_player = selected_player
+                    temp_button_hand.victim_player = player
                     self.root.ids.cards.add_widget(temp_button_hand)
                     self.root.ids[player.name].clear_widgets()
                     for card in player.equipments:
@@ -230,8 +232,8 @@ class GameDesignClient(App):
             self.change_prompt("You haven't select a player yet!")
 
     def steal_a_card(self, instance):
-        selected_player = [player for player in self.players if player.selected][0]
-        victim_player = [player for player in self.players if player.name == instance.text[:instance.text.find("\n")]][0]
+        selected_player = instance.selected_player
+        victim_player = instance.victim_player
         if victim_player.cards == []:
             self.change_prompt("There's no card to steal!")
         else:
@@ -259,7 +261,6 @@ class GameDesignClient(App):
                 modify = 1 if instance.color == [0.5, 1, 0, 1] else -1
                 setattr(selected_player, statistic_type, getattr(selected_player, statistic_type) + modify) #can't use selected_player.statistic_type to get value
             self.switch_player(selected_player.name)
-
         except IndexError:
             self.change_prompt("You haven't select a player yet!")
         except UnboundLocalError:
@@ -291,7 +292,7 @@ class GameDesignClient(App):
         self.switch_player(selected_player.name)
 
     def discard_an_equipment(self, instance):
-        selected_player = [player for player in self.players if player.selected][0]
+        selected_player = instance.player
         equipment_card_to_discard = instance.card
         equipment_card_to_discard.number = 1
         selected_player.equipments.remove(equipment_card_to_discard)
@@ -335,12 +336,14 @@ class GameDesignClient(App):
             for equipment in selected_player.equipments:
                 temp_button = Button(font_name="fonts/msyh.ttc",text=equipment.name, color=(1, 0, 0, 1),font_size=30)
                 temp_button.card = equipment
+                temp_button.player = selected_player
                 temp_button.bind(on_press=self.display_card)
                 self.root.ids.equipments.add_widget(temp_button)
             for card in selected_player.cards:
                 temp_button = Button(font_name="fonts/msyh.ttc", text=card.name, color=(1, 0, 0, 1), font_size=30)
                 temp_button.bind(on_press=self.display_card)
                 temp_button.card = card
+                temp_button.player = selected_player
                 self.root.ids.cards.add_widget(temp_button)
             for player in self.players:
                 self.root.ids[player.name].clear_widgets()
@@ -352,6 +355,7 @@ class GameDesignClient(App):
                     temp_button = Button(font_name="fonts/msyh.ttc",text=button_text, color=(1, 0, 0, 1), font_size=20)
                     temp_button.bind(on_press=self.display_card)
                     temp_button.card = card
+                    temp_button.player = selected_player
                     self.root.ids[player.name].add_widget(temp_button)
 
         except IndexError:
@@ -360,7 +364,10 @@ class GameDesignClient(App):
             self.change_prompt("You haven't select a player yet!")
 
     def display_card(self,instance):
-        self.change_prompt(f"{instance.card.name[:instance.card.name.find("(")]}: {instance.card.description}")
+        if instance.card not in instance.player.cards+instance.player.equipments and instance.card.number != 114514:
+            self.change_prompt("Can't check unrevealed card!")
+        else:
+            self.change_prompt(f"{instance.card.name[:instance.card.name.find("(")]}: {instance.card.description}")
 
 
 
