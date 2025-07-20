@@ -1,6 +1,6 @@
 class Player:
     def __init__(self, name="player", max_hp=5, current_hp=5, attack_range=2, max_energy=4, current_energy = 4, selected=False, cards=None,
-                 equipments=None):
+                 equipments=None, last_discard="n"):
         if equipments is None:
             equipments = []
         if cards is None:
@@ -14,3 +14,4 @@ class Player:
         self.equipments = equipments
         self.selected = selected
         self.current_energy = current_energy
+        self.last_discard = last_discard
