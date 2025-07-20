@@ -45,6 +45,17 @@ BoxLayout:
             BoxLayout:
                 id: player4
                 size_hint_y: 0.4
+        BoxLayout:
+            orientation: "vertical"
+            Button:
+                id: player5_button
+                text: "player5"
+                on_press: app.switch_player(self.text)
+                color: (1, 1, 1, 1)
+                font_size: 50
+            BoxLayout:
+                id: player5
+                size_hint_y: 0.4
         Button:
             text: "MENU"
             on_press: app.switch_player()
@@ -108,6 +119,10 @@ BoxLayout:
                     Button:
                         text: "Check Card"
                         on_press: app.activate_check_card()
+                        font_size: 30
+                    Button:
+                        text: "Withdraw Discard"
+                        on_press: app.withdraw_discard()
                         font_size: 30
 
         BoxLayout:

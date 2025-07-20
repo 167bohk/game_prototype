@@ -27,7 +27,8 @@ class GameDesignClient(App):
         self.player2 = Player(name="player2")
         self.player3 = Player(name="player3")
         self.player4 = Player(name="player4")
-        self.players = [self.player1, self.player2, self.player3, self.player4]
+        self.player5 = Player(name="player5")
+        self.players = [self.player1, self.player2, self.player3, self.player4, self.player5]
 
         with open(FILENAME, "r", encoding="utf-8", newline='') as in_file:
             in_file.readline()  # ignore headers
@@ -66,6 +67,8 @@ class GameDesignClient(App):
         print()
         print("Normal card pile: ")
         print([card.name for card in self.normal_card_pile])
+        print("Normal discard pile: ")
+        print([card.name for card in self.normal_discard_pile])
         print("<---------------------------------------------------------->")
         print("Premium Cards: ")
         for premium_card in self.premium_cards:
@@ -73,6 +76,8 @@ class GameDesignClient(App):
         print()
         print("Premium card pile: ")
         print([card.name for card in self.premium_card_pile])
+        print("Premium discard pile: ")
+        print([card.name for card in self.premium_discard_pile])
 
     def build(self):
         self.title = "Game Prototype"
@@ -183,13 +188,16 @@ class GameDesignClient(App):
         selected_player.cards.remove(card_to_discard)
         if card_to_discard.is_premium:
             self.premium_discard_pile.append(card_to_discard)
+            selected_player.last_discard = "p"
         else:
             self.normal_discard_pile.append(card_to_discard)
+            selected_player.last_discard = "n"
         self.switch_player(player_name)
 
     def activate_modify_model(self, name):
-        try:
-            selected_player = [player for player in self.players if player.selected][0]
+        if len([player for player in self.players if player.selected]) == 0:
+            self.change_prompt("You haven't select a player yet!")
+        else:
             self.root.ids.up_down.clear_widgets()
             temp_up_button = Button(font_name="fonts/msyh.ttc", text=name, color=(0.5, 1, 0, 1), font_size=30)
             temp_up_button.bind(on_press=self.modify_statistic)
@@ -200,10 +208,6 @@ class GameDesignClient(App):
             self.root.ids.up_down.add_widget(temp_up_button)
             self.root.ids.up_down.add_widget(temp_down_button)
             self.change_prompt(f"Modifying {name}, press green button to +1, press red button to -1.")
-        except IndexError:
-            self.change_prompt("You haven't select a player yet!")
-        except UnboundLocalError:
-            self.change_prompt("You haven't select a player yet!")
 
     def activate_steal(self):
         try:
@@ -303,8 +307,10 @@ class GameDesignClient(App):
         selected_player.equipments.remove(equipment_card_to_discard)
         if equipment_card_to_discard.is_premium:
             self.premium_discard_pile.append(equipment_card_to_discard)
+            selected_player.last_discard = "p"
         else:
             self.normal_discard_pile.append(equipment_card_to_discard)
+            selected_player.last_discard = "n"
         self.switch_player(selected_player.name)
 
     def create_show_equipment_buttons(self):
@@ -375,5 +381,19 @@ class GameDesignClient(App):
         else:
             self.change_prompt(f"{instance.card.name[:instance.card.name.find("(")]}: {instance.card.description}")
 
+
+    def withdraw_discard(self):
+        try:
+            selected_player = [player for player in self.players if player.selected][0]
+            if selected_player.last_discard == "p":
+                selected_player.cards.append(self.premium_discard_pile.pop(-1))
+
+            else:
+                selected_player.cards.append(self.normal_discard_pile.pop(-1))
+            self.switch_player(selected_player.name)
+        except IndexError:
+            self.change_prompt("There's no card to withdraw!")
+        except UnboundLocalError:
+            self.change_prompt("You haven't select a player yet!")
 
 GameDesignClient().run()
