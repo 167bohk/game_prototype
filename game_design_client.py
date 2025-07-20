@@ -344,7 +344,7 @@ class GameDesignClient(App):
                         button_text = card.name
                     else:
                         button_text = ""
-                    temp_button = Button(font_name="fonts/msyh.ttc",text=button_text, color=(1, 0, 0, 1))
+                    temp_button = Button(font_name="fonts/msyh.ttc",text=button_text, color=(1, 0, 0, 1), font_size=20)
                     temp_button.bind(on_press=self.display_card)
                     temp_button.card = card
                     self.root.ids[player.name].add_widget(temp_button)
