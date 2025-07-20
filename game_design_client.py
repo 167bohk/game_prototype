@@ -46,7 +46,7 @@ class GameDesignClient(App):
                 self.normal_cards.append(card)
         for normal_card in self.normal_cards:
             for i in range(1, normal_card.number + 1):
-                self.normal_card_pile.append(Card(name=(normal_card.name + str(i)), description=normal_card.description,
+                self.normal_card_pile.append(Card(name=f"{normal_card.name}({i})", description=normal_card.description,
                                                   is_premium=normal_card.is_premium, number=1))
         for premium_card in self.premium_cards:
             for i in range(1, premium_card.number + 1):
@@ -102,7 +102,7 @@ class GameDesignClient(App):
                 new_card = self.premium_card_pile.pop(random_index)
                 selected_player.cards.append(new_card)
             self.switch_player(selected_player.name)
-            self.change_prompt(f"{additional_prompt}Your new card: {new_card.description}", color)
+            self.change_prompt(f"{additional_prompt}New card: {new_card.description}", color)
 
         except IndexError:
             self.change_prompt("You haven't select a player yet!")
@@ -111,7 +111,7 @@ class GameDesignClient(App):
         except ValueError:
             self.change_prompt("No cards left to draw!")
 
-    def switch_player(self, player_name="empty"):
+    def switch_player(self, player_name="MENU"):
         self.change_prompt("")
         self.root.ids.cards.clear_widgets()
         self.root.ids.equipments.clear_widgets()
@@ -126,9 +126,9 @@ class GameDesignClient(App):
                     button_text = card.name
                 else:
                     button_text = ""
-                temp_button = Button(font_name="fonts/msyh.ttc",text=button_text, color=(0.5, 1, 0, 1))
+                temp_button = Button(font_name="fonts/msyh.ttc",text=button_text, color=(0.5, 1, 0, 1), font_size=20)
                 self.root.ids[player.name].add_widget(temp_button)
-        if player_name == "empty":
+        if player_name == "MENU":
             self.root.ids.statistics.text = "Switch to next player."
             temp_button = Button(font_name="fonts/msyh.ttc",text="Display Current Card Piles\n             (for DM only)", color=(1, 0, 0, 1),
                                  font_size=30)
@@ -323,18 +323,39 @@ class GameDesignClient(App):
         self.switch_player(selected_player.name)
 
     def activate_check_card(self):
-        self.root.ids.cards.clear_widgets()
-        self.root.ids.equipments.clear_widgets()
-        for player in self.players:
-            self.root.ids[player.name].clear_widgets()
-            for card in player.equipments:
-                if card.number == 114514:
-                    button_text = card.name
-                else:
-                    button_text = ""
-                temp_button = Button(font_name="fonts/msyh.ttc",text=button_text, color=(1, 0, 0, 1))
-                self.root.ids[player.name].add_widget(temp_button)
+        selected_player = [player for player in self.players if player.selected][0]
+        try:
+            self.root.ids.cards.clear_widgets()
+            self.root.ids.equipments.clear_widgets()
+            for equipment in selected_player.equipments:
+                temp_button = Button(font_name="fonts/msyh.ttc",text=equipment.name, color=(1, 0, 0, 1),font_size=30)
+                temp_button.card = equipment
+                temp_button.bind(on_press=self.display_card)
+                self.root.ids.equipments.add_widget(temp_button)
+            for card in selected_player.cards:
+                temp_button = Button(font_name="fonts/msyh.ttc", text=card.name, color=(1, 0, 0, 1), font_size=30)
+                temp_button.bind(on_press=self.display_card)
+                temp_button.card = card
+                self.root.ids.cards.add_widget(temp_button)
+            for player in self.players:
+                self.root.ids[player.name].clear_widgets()
+                for card in player.equipments:
+                    if card.number == 114514:
+                        button_text = card.name
+                    else:
+                        button_text = ""
+                    temp_button = Button(font_name="fonts/msyh.ttc",text=button_text, color=(1, 0, 0, 1))
+                    temp_button.bind(on_press=self.display_card)
+                    temp_button.card = card
+                    self.root.ids[player.name].add_widget(temp_button)
 
+        except IndexError:
+            self.change_prompt("You haven't select a player yet!")
+        except UnboundLocalError:
+            self.change_prompt("You haven't select a player yet!")
+
+    def display_card(self,instance):
+        self.change_prompt(f"{instance.card.name[:instance.card.name.find("(")]}: {instance.card.description}")
 
 
 
