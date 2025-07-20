@@ -19,7 +19,9 @@ class GameDesignClient(App):
         self.premium_card_pile = []
         self.premium_discard_pile = []
         self.premium_cards = []
+        self.total_premium_card_number = 0
         self.normal_cards = []
+        self.total_normal_card_number = 0
 
         self.player1 = Player(name="player1")
         self.player2 = Player(name="player2")
@@ -45,10 +47,12 @@ class GameDesignClient(App):
             else:
                 self.normal_cards.append(card)
         for normal_card in self.normal_cards:
+            self.total_normal_card_number += normal_card.number
             for i in range(1, normal_card.number + 1):
                 self.normal_card_pile.append(Card(name=f"{normal_card.name}({i})", description=normal_card.description,
                                                   is_premium=normal_card.is_premium, number=1))
         for premium_card in self.premium_cards:
+            self.total_premium_card_number += premium_card.number
             for i in range(1, premium_card.number + 1):
                 self.premium_card_pile.append(
                     Card(name=(premium_card.name + str(i)), description=premium_card.description,
@@ -129,7 +133,8 @@ class GameDesignClient(App):
                 temp_button = Button(font_name="fonts/msyh.ttc",text=button_text, color=(0.5, 1, 0, 1), font_size=20)
                 self.root.ids[player.name].add_widget(temp_button)
         if player_name == "MENU":
-            self.root.ids.statistics.text = "Switch to next player."
+            self.root.ids.statistics.text = f"Normal card pile: ({len(self.normal_card_pile)}/{self.total_normal_card_number})\nPremium card pile: ({len(self.premium_card_pile)}/{self.total_premium_card_number})"
+            self.root.ids.statistics.color = (1,1,1,1)
             temp_button = Button(font_name="fonts/msyh.ttc",text="Display Current Card Piles\n             (for DM only)", color=(1, 0, 0, 1),
                                  font_size=30)
             temp_button.bind(on_press=self.display_card_pile)
@@ -323,8 +328,8 @@ class GameDesignClient(App):
         self.switch_player(selected_player.name)
 
     def activate_check_card(self):
-        selected_player = [player for player in self.players if player.selected][0]
         try:
+            selected_player = [player for player in self.players if player.selected][0]
             self.root.ids.cards.clear_widgets()
             self.root.ids.equipments.clear_widgets()
             for equipment in selected_player.equipments:
