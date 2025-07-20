@@ -81,12 +81,12 @@ class GameDesignClient(App):
 
     def draw_card(self, card_type):
         additional_prompt = ""
-        color = (1,1,1,1)
+        color = (1, 1, 1, 1)
         if self.normal_card_pile == []:
             self.normal_card_pile[:], self.normal_discard_pile[:] = self.normal_discard_pile[:], self.normal_card_pile[
                                                                                                  :]
             additional_prompt = "Normal card pile has been reset!\n"
-            color = (1,0,0,1)
+            color = (1, 0, 0, 1)
 
         if self.premium_card_pile == []:
             self.premium_card_pile[:], self.premium_discard_pile[:] = self.premium_discard_pile[
@@ -130,12 +130,13 @@ class GameDesignClient(App):
                     button_text = card.name
                 else:
                     button_text = ""
-                temp_button = Button(font_name="fonts/msyh.ttc",text=button_text, color=(0.5, 1, 0, 1), font_size=20)
+                temp_button = Button(font_name="fonts/msyh.ttc", text=button_text, color=(0.5, 1, 0, 1), font_size=20)
                 self.root.ids[player.name].add_widget(temp_button)
         if player_name == "MENU":
             self.root.ids.statistics.text = f"Normal card pile: ({len(self.normal_card_pile)}/{self.total_normal_card_number})\nPremium card pile: ({len(self.premium_card_pile)}/{self.total_premium_card_number})"
-            self.root.ids.statistics.color = (1,1,1,1)
-            temp_button = Button(font_name="fonts/msyh.ttc",text="Display Current Card Piles\n             (for DM only)", color=(1, 0, 0, 1),
+            self.root.ids.statistics.color = (1, 1, 1, 1)
+            temp_button = Button(font_name="fonts/msyh.ttc",
+                                 text="Display Current Card Piles\n             (for DM only)", color=(1, 0, 0, 1),
                                  font_size=30)
             temp_button.bind(on_press=self.display_card_pile)
             self.root.ids.equipments.add_widget(temp_button)
@@ -145,31 +146,32 @@ class GameDesignClient(App):
             selected_player = [player for player in self.players if player.name == player_name][0]
             selected_player.selected = True
             self.root.ids.statistics.text = f"Name: {selected_player.name}\nMax HP:      {selected_player.max_hp}{selected_player.max_hp * "[]"}\nCurrent HP: {selected_player.current_hp}{selected_player.current_hp * "[]"}\nAttack Range: {selected_player.attack_range}\nMax Energy: {selected_player.max_energy}\nCurrent Energy: {selected_player.current_energy}"
-            self.root.ids.statistics.color=tuple(self.root.ids[selected_player.name+"_button"].color)
+            self.root.ids.statistics.color = tuple(self.root.ids[selected_player.name + "_button"].color)
             for card in selected_player.cards:
                 if card.is_premium:
                     color = (0.9, 0, 0.9, 1)
                 else:
                     color = (0, 1, 1, 1)
-                temp_button = Button(font_name="fonts/msyh.ttc",text=f"{card.name}", font_size=30, color=color)
+                temp_button = Button(font_name="fonts/msyh.ttc", text=f"{card.name}", font_size=30, color=color)
                 temp_button.card = card
                 temp_button.bind(on_press=self.discard_a_card)
                 temp_button.player = selected_player
                 self.root.ids.cards.add_widget(temp_button)
 
             for equipment in selected_player.equipments:
-                temp_button = Button(font_name="fonts/msyh.ttc",text=equipment.name, color=(0.5, 1, 0, 1),font_size=30)
+                temp_button = Button(font_name="fonts/msyh.ttc", text=equipment.name, color=(0.5, 1, 0, 1),
+                                     font_size=30)
                 temp_button.card = equipment
                 temp_button.bind(on_press=self.discard_an_equipment)
                 temp_button.player = selected_player
                 self.root.ids.equipments.add_widget(temp_button)
 
-            temp_up_button = Button(font_name="fonts/msyh.ttc",text="up", font_size=30)
-            temp_down_button = Button(font_name="fonts/msyh.ttc",text="down", font_size=30)
+            temp_up_button = Button(font_name="fonts/msyh.ttc", text="up", font_size=30)
+            temp_down_button = Button(font_name="fonts/msyh.ttc", text="down", font_size=30)
             self.root.ids.up_down.add_widget(temp_up_button)
             self.root.ids.up_down.add_widget(temp_down_button)
 
-    def change_prompt(self, prompt, color=(1,1,1,1)):
+    def change_prompt(self, prompt, color=(1, 1, 1, 1)):
         self.root.ids.output_prompt.color = color
         self.root.ids.output_prompt.text = prompt
 
@@ -189,10 +191,10 @@ class GameDesignClient(App):
         try:
             selected_player = [player for player in self.players if player.selected][0]
             self.root.ids.up_down.clear_widgets()
-            temp_up_button = Button(font_name="fonts/msyh.ttc",text=name, color=(0.5, 1, 0, 1), font_size=30)
+            temp_up_button = Button(font_name="fonts/msyh.ttc", text=name, color=(0.5, 1, 0, 1), font_size=30)
             temp_up_button.bind(on_press=self.modify_statistic)
 
-            temp_down_button = Button(font_name="fonts/msyh.ttc",text=name, color=(1, 0, 0, 1), font_size=30)
+            temp_down_button = Button(font_name="fonts/msyh.ttc", text=name, color=(1, 0, 0, 1), font_size=30)
             temp_down_button.bind(on_press=self.modify_statistic)
 
             self.root.ids.up_down.add_widget(temp_up_button)
@@ -209,7 +211,9 @@ class GameDesignClient(App):
             self.root.ids.cards.clear_widgets()
             for player in self.players:
                 if player.name != selected_player.name:
-                    temp_button_hand = Button(font_name="fonts/msyh.ttc",text=f"{player.name}\n(hand){len(player.cards)}", font_size=30, color=tuple(self.root.ids[player.name+"_button"].color))
+                    temp_button_hand = Button(font_name="fonts/msyh.ttc",
+                                              text=f"{player.name}\n(hand){len(player.cards)}", font_size=30,
+                                              color=tuple(self.root.ids[player.name + "_button"].color))
                     temp_button_hand.bind(on_press=self.steal_a_card)
                     temp_button_hand.selected_player = selected_player
                     temp_button_hand.victim_player = player
@@ -241,7 +245,7 @@ class GameDesignClient(App):
             selected_player.cards.append(victim_player.cards.pop(random_card_index))
             self.switch_player(selected_player.name)
 
-    def steal_an_equipment(self,instance):
+    def steal_an_equipment(self, instance):
         selected_player = [player for player in self.players if player.selected][0]
         equipment = instance.card
         victim_player = [player for player in self.players if equipment in player.equipments][0]
@@ -259,7 +263,8 @@ class GameDesignClient(App):
                 statistic_type = instance.text
                 # print(instance.color)
                 modify = 1 if instance.color == [0.5, 1, 0, 1] else -1
-                setattr(selected_player, statistic_type, getattr(selected_player, statistic_type) + modify) #can't use selected_player.statistic_type to get value
+                setattr(selected_player, statistic_type, getattr(selected_player,
+                                                                 statistic_type) + modify)  # can't use selected_player.statistic_type to get value
             self.switch_player(selected_player.name)
         except IndexError:
             self.change_prompt("You haven't select a player yet!")
@@ -275,7 +280,7 @@ class GameDesignClient(App):
                 self.change_prompt("You don't have any card :(")
             else:
                 for card in selected_player.cards:
-                    temp_button = Button(font_name="fonts/msyh.ttc",text=card.name, color=(1, 0, 0, 1), font_size=30)
+                    temp_button = Button(font_name="fonts/msyh.ttc", text=card.name, color=(1, 0, 0, 1), font_size=30)
                     temp_button.bind(on_press=self.move_card_to_equipment)
                     self.root.ids.cards.add_widget(temp_button)
                 self.change_prompt("Equipment select model.")
@@ -302,7 +307,6 @@ class GameDesignClient(App):
             self.normal_discard_pile.append(equipment_card_to_discard)
         self.switch_player(selected_player.name)
 
-
     def create_show_equipment_buttons(self):
         try:
             selected_player = [player for player in self.players if player.selected][0]
@@ -312,7 +316,8 @@ class GameDesignClient(App):
                 self.change_prompt("You don't have any equipment!")
             else:
                 for equipment in equipments:
-                    temp_button = Button(font_name="fonts/msyh.ttc",text=equipment.name, color=(1, 0, 0, 1), font_size=30)
+                    temp_button = Button(font_name="fonts/msyh.ttc", text=equipment.name, color=(1, 0, 0, 1),
+                                         font_size=30)
                     temp_button.bind(on_press=self.show_equipment)
                     self.root.ids.equipments.add_widget(temp_button)
                 self.change_prompt("Select equipment to show.")
@@ -324,7 +329,8 @@ class GameDesignClient(App):
 
     def show_equipment(self, instance):
         selected_player = [player for player in self.players if player.selected][0]
-        equipment_to_show = [equipment for equipment in selected_player.equipments if equipment.name == instance.text][0]
+        equipment_to_show = [equipment for equipment in selected_player.equipments if equipment.name == instance.text][
+            0]
         equipment_to_show.number = 114514
         self.switch_player(selected_player.name)
 
@@ -334,7 +340,7 @@ class GameDesignClient(App):
             self.root.ids.cards.clear_widgets()
             self.root.ids.equipments.clear_widgets()
             for equipment in selected_player.equipments:
-                temp_button = Button(font_name="fonts/msyh.ttc",text=equipment.name, color=(1, 0, 0, 1),font_size=30)
+                temp_button = Button(font_name="fonts/msyh.ttc", text=equipment.name, color=(1, 0, 0, 1), font_size=30)
                 temp_button.card = equipment
                 temp_button.player = selected_player
                 temp_button.bind(on_press=self.display_card)
@@ -352,7 +358,7 @@ class GameDesignClient(App):
                         button_text = card.name
                     else:
                         button_text = ""
-                    temp_button = Button(font_name="fonts/msyh.ttc",text=button_text, color=(1, 0, 0, 1), font_size=20)
+                    temp_button = Button(font_name="fonts/msyh.ttc", text=button_text, color=(1, 0, 0, 1), font_size=20)
                     temp_button.bind(on_press=self.display_card)
                     temp_button.card = card
                     temp_button.player = selected_player
@@ -363,12 +369,11 @@ class GameDesignClient(App):
         except UnboundLocalError:
             self.change_prompt("You haven't select a player yet!")
 
-    def display_card(self,instance):
-        if instance.card not in instance.player.cards+instance.player.equipments and instance.card.number != 114514:
+    def display_card(self, instance):
+        if instance.card not in instance.player.cards + instance.player.equipments and instance.card.number != 114514:
             self.change_prompt("Can't check unrevealed card!")
         else:
             self.change_prompt(f"{instance.card.name[:instance.card.name.find("(")]}: {instance.card.description}")
-
 
 
 GameDesignClient().run()
